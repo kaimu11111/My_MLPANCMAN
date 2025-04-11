@@ -21,7 +21,7 @@ function LoadJSONButton() {
             
 
             for (const image of image_data.data) {
-                newImgSrcArr.push({ src: image.src, label: image.label });
+                newImgSrcArr.push({ src: image.src, label: image.labe,confidence: undefined, prediction: undefined });
             }
 
             setImgSrcArr(newImgSrcArr);

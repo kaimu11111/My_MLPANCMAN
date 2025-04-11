@@ -19,6 +19,6 @@ export const lossAtom = atom(null); // Loss value
 export const trainingProgressAtom = atom(-1); // Training progress
 export const stopTrainingAtom = atom(false); // Flag to stop training
 
-
+export const isFinetunedAtom = atom(false);
 export const maxProbabilityAtom = atom(null); // Maximum probability of the prediction
 

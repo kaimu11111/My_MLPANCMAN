@@ -149,6 +149,20 @@ export async function predict(truncatedMobileNet, model, img) {
   return classId;
 }
 
+export async function predict_(truncatedMobileNet, model, img) {
+  const embeddings = truncatedMobileNet.predict(img);
+  const predictions = await model.predict(embeddings);
+  const predictedClass = predictions.as1D().argMax();
+  const classId = (await predictedClass.data())[0];
+
+
+  const predictionArray = await predictions.array();
+  const maxProbability = Math.max(...predictionArray[0]);
+
+
+  return { classId, maxProbability };
+}
+
 export async function predictDirection(webcamRef, truncatedMobileNet, model) {
   const newImageSrc = webcamRef.current.getScreenshot();
   if (newImageSrc) {
@@ -202,4 +216,7 @@ export async function base64ToTensor(base64) {
     // Assign the base64 image source
     img.src = base64;
   });
+
+  
 }
+

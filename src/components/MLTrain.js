@@ -6,7 +6,9 @@ import {
     Grid,
     Typography,
     LinearProgress,
+    Box
 } from "@mui/material";
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import React, { useEffect, useState, Suspense, useRef } from "react";
 import { buildModel, processImages, predictDirection } from "../model";
 import {
@@ -23,12 +25,14 @@ import {
     imgSrcArrAtom,
     gameRunningAtom,
     predictionAtom,
+
 } from "../GlobalState";
 import { useAtom } from "jotai";
 import { data, train } from "@tensorflow/tfjs";
 // import JSONWriter from "./JSONWriter";
 // import JSONLoader from "./JSONLoader";
-
+import { isFinetunedAtom } from "../GlobalState";
+import { predictAllImages } from "./predictAllImage";
 function generateSelectComponent(
     label,
     options,
@@ -68,7 +72,7 @@ export default function MLTrain({ webcamRef }) {
     // ---- Model Training ----
     const [model, setModel] = useAtom(modelAtom);
     const [truncatedMobileNet] = useAtom(truncatedMobileNetAtom);
-    const [imgSrcArr] = useAtom(imgSrcArrAtom);
+    const [imgSrcArr, setImgSrcArr] = useAtom(imgSrcArrAtom);
 
     // ---- UI Display ----
     const [lossVal, setLossVal] = useAtom(lossAtom);
@@ -106,7 +110,7 @@ export default function MLTrain({ webcamRef }) {
     }, [isRunning]);
 
     
-
+    const [isFinetuned, setIsFinetuned] = useAtom(isFinetunedAtom);
     // Train the model when called
     async function trainModel() {
         setTrainingProgress("Stop");
@@ -119,6 +123,8 @@ export default function MLTrain({ webcamRef }) {
             epochs,
             learningRate)
         setModel(model);
+        await predictAllImages(imgSrcArr, setImgSrcArr, truncatedMobileNet, model);
+        setIsFinetuned(true);
     }
 
     const stopTrain = () => {
@@ -135,6 +141,7 @@ export default function MLTrain({ webcamRef }) {
     const ReguarlDisplay = (
         <Grid container space={2}>
             <Grid item xs={6}>
+                
                 <Button
                     variant="contained"
                     color="primary"
@@ -144,6 +151,18 @@ export default function MLTrain({ webcamRef }) {
                 >
                     {trainingProgress == -1 ? "Train" : lossVal? "Stop": 'Loading...'}
                 </Button>
+                {isFinetuned && (
+                    <Box sx={{ 
+                        display: 'flex',
+                        alignItems: 'center',
+                        color: 'success.main',
+                        fontSize: '0.875rem'
+                    }}> 
+                        
+                        <CheckCircleIcon fontSize="small" sx={{ mr: 0.5 }} />
+                        <span>Model Finetuned</span>
+                    </Box>
+                    )}
                 <LinearProgress
                     variant="determinate"
                     value={trainingProgress}
