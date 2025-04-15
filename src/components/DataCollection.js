@@ -37,7 +37,17 @@ export default function DataCollection({ webcamRef }) {
     const [gameRunning] = useAtom(gameRunningAtom);
 
     // ---- UI Display ----
-
+    const getDirectionText = (value) => {
+        if (typeof value !== 'number' || !Number.isInteger(value)) {
+          return "No Prediction";
+        }
+      
+        if (value >= 0 && value <= 3) {
+          return `Current Predicted direction: ${arrow_dic[value]}`;
+        } else {
+          return "Invalid Direction";
+        }
+      };
     const capture = (direction) => async () => {
         // Capture image from webcam
         const newImageSrc = webcamRef.current.getScreenshot();
@@ -46,22 +56,18 @@ export default function DataCollection({ webcamRef }) {
         if (newImageSrc) {
 
             // Add example to the dataset
-            const newImageArr = [...imgSrcArr, { src: newImageSrc, 
-                                                 label: direction,
-                                                 confidence: undefined,
-                                                 prediction: undefined }];
-
+            const newImageArr = [...imgSrcArr, { src: newImageSrc, label: direction }];
             setImgSrcArr(newImageArr);
             setBatchSize(Math.floor(newImageArr.length * 0.4));
         }
     };
-    const arrow_dic = ["UP", "DOWN", "LEFT", "RIGHT"];
+    const arrow_dic = ["RIGHT", "UP", "LEFT", "DOWN"];
 
     const cameraPlaceholder = (
         <Box
             display="flex"
             textAlign={"center"}
-            justifyContent="center"
+            justifyContent="center"   
             alignItems="center"
             sx={{
                 p: 2,
@@ -72,18 +78,34 @@ export default function DataCollection({ webcamRef }) {
                 backgroundColor: "#ddd",
             }}
         >
-            Camera is off
+            Please turn on the cemara to collect data
         </Box>
     );
-
+    const [predictionDirection] = useAtom(predictionAtom);
+    const [maxProbability] = useAtom(maxProbabilityAtom);
     return (
-        <Grid container>
+        <Grid container position={"relative"}>
             {/* first row */}
+            <Box
+            position="absolute"
+            top={40}
+            right={0}
+            
+            sx={{backgroundColor: "white", borderRadius: "2px", width: "250px", height: "240px",fontSize: "30px",}}>
+            {getDirectionText(predictionDirection)}
+            
+            <div style={{ height: "20px" }}></div>
+            <div style={{ fontSize: "30px" }}>
+            {maxProbability
+            ? `Confidence Score: ${Math.round(maxProbability * 100)}%`
+            : "None"}
+            </div>
 
+            </Box>
             <Grid
                 item
                 xs={12}
-                sx={{ marginBottom: 2 }}
+                sx={{ marginBottom: 2, marginRight: 30 }}
                 display="flex"
                 alignItems="center"
                 justifyContent="center"
