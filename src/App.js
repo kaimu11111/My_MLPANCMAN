@@ -12,10 +12,12 @@ import {
     Grid,
     Paper,
 } from "@mui/material";
-
+import { imageGalleryAtom } from "./GlobalState";
+import { useAtom } from "jotai";
+import ImageGallery from "./components/imageGallery";
 export default function App() {
+    const [_,setimageGallery] = useAtom(imageGalleryAtom);
     const webcamRef = React.useRef(null);
-
     return (
         <Box sx={{ display: "flex" }}>
             <CssBaseline />
@@ -71,12 +73,13 @@ export default function App() {
                         {/* Recent Deposits */}
                         <Grid item xs={12} md={6} lg={6}>
                             <Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
-                                <PacMan />
+                                <PacMan/>
                             </Paper>
                         </Grid>
                     </Grid>
                 </Container>
             </Box>
+            <ImageGallery />
         </Box>
     );
 }

@@ -9,8 +9,11 @@ import TopBar from "./TopBar";
 import AllFood from "./Food/All";
 import Monster from "./Monster";
 import Player from "./Player";
+import { useAtom } from "jotai";
+import { imageGalleryAtom } from "../../GlobalState";
 
 export default class PacmanCovid extends Component {
+  
   constructor(props) {
     super(props);
 
@@ -88,6 +91,9 @@ export default class PacmanCovid extends Component {
   handleTheEnd() {
     this.props.setIsRuning(false);
     this.setState({ isShowDialog: true });
+    if (this.props.onEnd) {
+      this.props.onEnd();
+    }
   }
 
   render() {

@@ -25,13 +25,14 @@ import {
     imgSrcArrAtom,
     gameRunningAtom,
     predictionAtom,
-
+    maxProbabilityAtom,
+    newImgSrcArrAtom
 } from "../GlobalState";
-import { useAtom } from "jotai";
+import { useAtom, getDefaultStore} from "jotai";
 import { data, train } from "@tensorflow/tfjs";
 // import JSONWriter from "./JSONWriter";
 // import JSONLoader from "./JSONLoader";
-import { isFinetunedAtom } from "../GlobalState";
+import { isFinetunedAtom, predictionDetailsAtom } from "../GlobalState";
 import { predictAllImages } from "./predictAllImage";
 function generateSelectComponent(
     label,
@@ -83,7 +84,7 @@ export default function MLTrain({ webcamRef }) {
     const batchValueArray = [0.05, 0.1, 0.4, 1].map(r=>Math.floor(imgSrcArr.length * r));
     
     const [, setStopTraining] = useAtom(stopTrainingAtom);
-
+    const [newImgSrcArr, setNewImgSrcArr] = useAtom(newImgSrcArrAtom);
     // Reference to update isRunning
     const isRunningRef = useRef(isRunning);
 
@@ -95,9 +96,18 @@ export default function MLTrain({ webcamRef }) {
     // Loop to predict direction
     async function runPredictionLoop() {
         while (isRunningRef.current) {
-            setPredictionDirection(
-                await predictDirection(webcamRef, truncatedMobileNet, model)
-            );
+            const predictions = await predictDirection(webcamRef, truncatedMobileNet, model);
+            setPredictionDirection(predictions);
+            const store = getDefaultStore();
+            const maxProbability = store.get(maxProbabilityAtom);
+            if(maxProbability > 0.8) {
+            console.log("Adding image to collection:", {
+                src: webcamRef.current.getScreenshot(),
+                label: predictions,
+                confidence: maxProbability,
+            });
+            setNewImgSrcArr((prev) => [...prev, { src: webcamRef.current.getScreenshot(), label: predictions,confidence: maxProbability }]);
+            }
             await new Promise((resolve) => setTimeout(resolve, 250));
         }
     }

@@ -22,3 +22,6 @@ export const stopTrainingAtom = atom(false); // Flag to stop training
 export const isFinetunedAtom = atom(false);
 export const maxProbabilityAtom = atom(null); // Maximum probability of the prediction
 
+export const newImgSrcArrAtom = atom([]); // New image source array for prediction
+
+export const imageGalleryAtom = atom(false);

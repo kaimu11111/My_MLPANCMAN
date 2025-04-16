@@ -1,6 +1,6 @@
 import * as tf from "@tensorflow/tfjs";
 import { getDefaultStore } from "jotai";
-import { stopTrainingAtom, trainingProgressAtom } from "../GlobalState";
+import { predictionDetailsAtom, stopTrainingAtom, trainingProgressAtom } from "../GlobalState";
 import { maxProbabilityAtom } from "../GlobalState";
 export async function loadTruncatedMobileNet() {
   const mobilenet = await tf.loadLayersModel(
@@ -158,7 +158,7 @@ export async function predict_(truncatedMobileNet, model, img) {
 
   const predictionArray = await predictions.array();
   const maxProbability = Math.max(...predictionArray[0]);
-
+  
 
   return { classId, maxProbability };
 }
@@ -168,6 +168,7 @@ export async function predictDirection(webcamRef, truncatedMobileNet, model) {
   if (newImageSrc) {
     const imgTensor = await base64ToTensor(newImageSrc);
     const prediction = await predict(truncatedMobileNet, model, imgTensor);
+
 
     switch (prediction) {
       case 0:

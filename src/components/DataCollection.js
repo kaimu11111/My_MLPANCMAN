@@ -37,6 +37,8 @@ export default function DataCollection({ webcamRef }) {
     const [gameRunning] = useAtom(gameRunningAtom);
 
     // ---- UI Display ----
+
+    const arrow_dic = ["RIGHT", "UP", "LEFT", "DOWN"];
     const getDirectionText = (value) => {
         if (typeof value !== 'number' || !Number.isInteger(value)) {
           return "No Prediction";
@@ -61,7 +63,7 @@ export default function DataCollection({ webcamRef }) {
             setBatchSize(Math.floor(newImageArr.length * 0.4));
         }
     };
-    const arrow_dic = ["RIGHT", "UP", "LEFT", "DOWN"];
+
 
     const cameraPlaceholder = (
         <Box
@@ -93,7 +95,7 @@ export default function DataCollection({ webcamRef }) {
             
             sx={{backgroundColor: "white", borderRadius: "2px", width: "250px", height: "240px",fontSize: "30px",}}>
             {getDirectionText(predictionDirection)}
-            
+
             <div style={{ height: "20px" }}></div>
             <div style={{ fontSize: "30px" }}>
             {maxProbability
@@ -206,7 +208,7 @@ const OneDirection = ({ directionIcon, onCapture, dirImgSrcArr, disabled }) => {
                 {images.map((img, index) => {
                     const isLowConfidence = img.confidence !== undefined && img.confidence < 0.7;
                     const isWrongPrediction = arrow_dic[img.prediction] !== undefined && arrow_dic[img.prediction] !== img.label;
-
+                    const noPridiction = img.prediction === undefined;
                 return (
                 <Tooltip
                     key={index}
@@ -231,7 +233,9 @@ const OneDirection = ({ directionIcon, onCapture, dirImgSrcArr, disabled }) => {
                         display: "inline-block",
                         border: (isLowConfidence || isWrongPrediction) 
                             ? "2px solid #ff4444" 
-                            : "1px solid #ddd",
+                            : noPridiction
+                            ? "1px solid #ddd"
+                            : "2px solid green",
                         borderRadius: "6px",
                         overflow: "hidden",
                         flexShrink: 0,
