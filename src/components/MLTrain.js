@@ -95,6 +95,7 @@ export default function MLTrain({ webcamRef }) {
 
     // Loop to predict direction
     async function runPredictionLoop() {
+        const directionarray = ["right", "up", "left", "down"];
         while (isRunningRef.current) {
             const predictions = await predictDirection(webcamRef, truncatedMobileNet, model);
             setPredictionDirection(predictions);
@@ -103,10 +104,10 @@ export default function MLTrain({ webcamRef }) {
             if(maxProbability > 0.8) {
             console.log("Adding image to collection:", {
                 src: webcamRef.current.getScreenshot(),
-                label: predictions,
+                label: directionarray[predictions],
                 confidence: maxProbability,
             });
-            setNewImgSrcArr((prev) => [...prev, { src: webcamRef.current.getScreenshot(), label: predictions,confidence: maxProbability }]);
+            setNewImgSrcArr((prev) => [...prev, { src: webcamRef.current.getScreenshot(), label: directionarray[predictions] ,confidence: maxProbability }]);
             }
             await new Promise((resolve) => setTimeout(resolve, 250));
         }

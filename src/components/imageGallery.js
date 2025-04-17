@@ -10,10 +10,11 @@ import {
   useTheme,
   Chip,
   Stack,
-  Tooltip
+  Tooltip,
+  Button
 } from '@mui/material';
 import { Close, ZoomIn, Info } from '@mui/icons-material'
-import { imageGalleryAtom, newImgSrcArrAtom,selectedImageAtom } from '../GlobalState'; 
+import { imageGalleryAtom, newImgSrcArrAtom,selectedImageAtom,imgSrcArrAtom } from '../GlobalState'; 
 
 const ImageGallery = () => {
   const [galleryOpen, setGalleryOpen] = useAtom(imageGalleryAtom);
@@ -21,11 +22,14 @@ const ImageGallery = () => {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
   const [imageCollection, setImageCollection] = useAtom(newImgSrcArrAtom);
+  const [imgSrcArr, setImgSrcArr] = useAtom(imgSrcArrAtom); // Assuming this is the atom for the image collection
+  const [saveSuccess, setSaveSuccess] = React.useState(false);
   console.log("Image collection in ImageGallery:", imageCollection);
   const handleClose = () => {
     setGalleryOpen(false);
     setSelectedImage([]);
     setImageCollection([]); 
+    setSaveSuccess(false);
   };
   const handleImageClick = (img) => {
     setSelectedImage(prev => {
@@ -35,9 +39,15 @@ const ImageGallery = () => {
         : [...prev, img];
     });
   };
-  const directionarray = ["Right", "Up", "Left", "Down"];
-  const imageCount = imageCollection.length;
 
+  const handleSavingImages = () => {
+    setImgSrcArr((prev) => [...prev, ...selectedImages]);
+    setSelectedImage([]);
+    setSaveSuccess(true);
+  };
+  const directionarray = ["right", "up", "left", "down"];
+  const imageCount = imageCollection.length;
+  
   return (
     <>
       <Dialog
@@ -123,7 +133,7 @@ const ImageGallery = () => {
           }}
         >
           <Stack spacing={0.5}>
-            <Typography variant="caption">Label: {directionarray[img.label]}</Typography>
+            <Typography variant="caption">Label: {img.label}</Typography>
             <Typography variant="caption">
               Confidence: {(img.confidence * 100).toFixed(1)}%
             </Typography>
@@ -150,7 +160,22 @@ const ImageGallery = () => {
             )}
           </Grid>
         </DialogContent>
-
+        <div style={{ textAlign: 'center', padding: '16px' }}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => handleSavingImages()}
+        >
+          Saving images for training
+        </Button>
+        </div>
+        
+        {saveSuccess && (
+          <div style={{ textAlign: 'center', color: 'green', marginTop: '16px' }}>
+            Saving success!
+          </div>
+        )}
+            
         <IconButton
           onClick={handleClose}
           sx={{

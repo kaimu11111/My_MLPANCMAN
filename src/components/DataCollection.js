@@ -164,11 +164,13 @@ const OneDirection = ({ directionIcon, onCapture, dirImgSrcArr, disabled }) => {
     const [images, setImages] = useState([]);
     const arrow_dic = ["up", "down", "left", "right"];
     useEffect(() => {
+        console.log("Current dirImgSrcArr:", dirImgSrcArr);
         setImages(dirImgSrcArr);
-      }, [dirImgSrcArr]);
+    }, [dirImgSrcArr]);
     const handleclick = () => {
         onCapture();
         setIsSaved(true);
+        setImages((prevImages) => [...prevImages, ...dirImgSrcArr]);
     }
     const handleDelete = (indexToDelete) => {
         setImgSrcArr((prevArr) =>
@@ -176,6 +178,7 @@ const OneDirection = ({ directionIcon, onCapture, dirImgSrcArr, disabled }) => {
                 return !(item.label === dirImgSrcArr[0]?.label && dirImgSrcArr.indexOf(item) === indexToDelete);
             })
         );
+        setImages((prevImages) => prevImages.filter((_, i) => i !== indexToDelete));
     };
     return (
         <Grid item xs={3}>
